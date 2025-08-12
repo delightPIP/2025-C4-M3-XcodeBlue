@@ -35,7 +35,6 @@ final class HealthKitQueryFetchManager: ObservableObject {
     /// HealthKit 권한 상태 확인 (간단한 확인용)
     func checkAuthorizationStatus() async -> Bool {
         guard let daylightType = HKQuantityType.quantityType(forIdentifier: .timeInDaylight) else {
-            print("❌ [HealthKitQueryFetchManager] Invalid daylight type")
             return false
         }
         
@@ -43,16 +42,16 @@ final class HealthKitQueryFetchManager: ObservableObject {
         
         switch status {
         case .notDetermined:
-            print("🔐 [HealthKitQueryFetchManager] HealthKit authorization: NOT_DETERMINED - 권한 요청 필요")
+            print("[HealthKitQueryFetchManager] HealthKit authorization: NOT_DETERMINED - 권한 요청 필요")
             return false
         case .sharingDenied:
-            print("🔐 [HealthKitQueryFetchManager] HealthKit authorization: DENIED - 사용자가 거부함")
+            print("[HealthKitQueryFetchManager] HealthKit authorization: DENIED - 사용자가 거부함")
             return false
         case .sharingAuthorized:
-            print("🔐 [HealthKitQueryFetchManager] HealthKit authorization: AUTHORIZED - 권한 있음")
+            print("[HealthKitQueryFetchManager] HealthKit authorization: AUTHORIZED - 권한 있음")
             return true
         @unknown default:
-            print("🔐 [HealthKitQueryFetchManager] HealthKit authorization: UNKNOWN(\(status.rawValue))")
+            print("[HealthKitQueryFetchManager] HealthKit authorization: UNKNOWN(\(status.rawValue))")
             return false
         }
     }
@@ -65,7 +64,7 @@ final class HealthKitQueryFetchManager: ObservableObject {
         let now = Date()
         let startOfDay = calendar.startOfDay(for: now)
         
-        print("📅 [HealthKitQueryFetchManager] Fetching today's samples from \(startOfDay.formatted()) to \(now.formatted())")
+        print("[HealthKitQueryFetchManager] Fetching today's samples from \(startOfDay.formatted()) to \(now.formatted())")
         await fetchSamples(from: startOfDay, to: now)
     }
 
@@ -97,16 +96,16 @@ final class HealthKitQueryFetchManager: ObservableObject {
                     ]
                 ) { _, results, error in
                     if let error = error {
-                        print("❌ [HealthKitQueryFetchManager] Query error: \(error)")
+                        print("[HealthKitQueryFetchManager] Query error: \(error)")
                         continuation.resume(throwing: HealthKitError.queryFailed(error))
                     } else {
                         let quantitySamples = (results as? [HKQuantitySample]) ?? []
-                        print("✅ [HealthKitQueryFetchManager] Query successful, found \(quantitySamples.count) samples")
+                        print("[HealthKitQueryFetchManager] Query successful, found \(quantitySamples.count) samples")
                         
                         // 샘플 상세 정보 출력
                         for (index, sample) in quantitySamples.enumerated() {
                             let durationMinutes = sample.quantity.doubleValue(for: .minute())
-                            print("📝 [HealthKitQueryFetchManager] Sample \(index + 1): \(durationMinutes) minutes (\(sample.startDate.formatted(date: .omitted, time: .shortened)) - \(sample.endDate.formatted(date: .omitted, time: .shortened)))")
+                            print("[HealthKitQueryFetchManager] Sample \(index + 1): \(durationMinutes) minutes (\(sample.startDate.formatted(date: .omitted, time: .shortened)) - \(sample.endDate.formatted(date: .omitted, time: .shortened)))")
                         }
                         
                         continuation.resume(returning: quantitySamples)
@@ -253,7 +252,7 @@ final class HealthKitQueryFetchManager: ObservableObject {
         if let observerQuery = backgroundObserverQuery {
             healthStore.stop(observerQuery)
             backgroundObserverQuery = nil
-            print("🛑 [HealthKitQueryFetchManager] Stopped observing HealthKit updates")
+            print("[HealthKitQueryFetchManager] Stopped observing HealthKit updates")
         }
     }
 }
