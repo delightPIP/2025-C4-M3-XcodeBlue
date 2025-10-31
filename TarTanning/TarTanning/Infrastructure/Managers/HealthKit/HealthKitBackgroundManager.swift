@@ -40,7 +40,7 @@ final class HealthKitBackgroundManager: ObservableObject {
         self.syncUseCase = syncUseCase
         await enableBackgroundDelivery(for: type, frequency: .immediate)
         setupObserverQuery(for: type)
-        print("✅ [HealthKitBackgroundManager] Fully configured with useCase")
+        print("[HealthKitBackgroundManager] Fully configured with useCase")
     }
 
     func enableBackgroundDelivery(for type: HKObjectType, frequency: HKUpdateFrequency) async {
@@ -118,14 +118,13 @@ final class HealthKitBackgroundManager: ObservableObject {
                     self.lastObservedType = type
                     self.delegate?.observerQueryDidUpdate(for: type)
                     
-                    print("🌤️ [HealthKitBackgroundManager] ObserverQuery triggered. Executing background sync...")
+                    print("[HealthKitBackgroundManager] ObserverQuery triggered. Executing background sync...")
 
-                    // ✅ 백그라운드 UV 데이터 싱크 실행
                     if let syncUseCase = self.syncUseCase {
                         await syncUseCase.execute()
-                        print("✅ [HealthKitBackgroundManager] Background sync complete.")
+                        print("[HealthKitBackgroundManager] Background sync complete.")
                     } else {
-                        print("⚠️ [HealthKitBackgroundManager] syncUseCase not set")
+                        print("[HealthKitBackgroundManager] syncUseCase not set")
                     }
                 }
             }
